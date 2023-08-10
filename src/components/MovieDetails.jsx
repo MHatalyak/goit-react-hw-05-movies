@@ -1,17 +1,14 @@
 import React, { useState, useEffect } from 'react';
-import { useParams, Link } from 'react-router-dom';
+import { useParams, useLocation, useNavigate } from 'react-router-dom';
 import axios from 'axios';
-import Cast from './Cast'; // Import the Cast component
-import Reviews from './Review'; // Import the Reviews component
 
 const MovieDetails = () => {
   const { movieId } = useParams();
   const [movieDetails, setMovieDetails] = useState({});
-  const [cast, setCast] = useState([]);
-  const [reviews, setReviews] = useState([]);
   const [showCast, setShowCast] = useState(false);
-  const [showReviews, setShowReviews] = useState(false);
-
+  const location = useLocation();
+  const navigate = useNavigate();
+  const cameBack = location.state?.from ?? '/';
   useEffect(() => {
     axios
       .get(`https://api.themoviedb.org/3/movie/${movieId}`, {
@@ -25,39 +22,35 @@ const MovieDetails = () => {
       .catch(error => {
         console.error('Error fetching movie details:', error);
       });
+  });
 
-    axios
-      .get(`https://api.themoviedb.org/3/movie/${movieId}/credits`, {
-        params: {
-          api_key: '488a10199f756ebd19425cffe6e22e26',
-        },
-      })
-      .then(response => {
-        setCast(response.data.cast);
-      })
-      .catch(error => {
-        console.error('Error fetching movie cast:', error);
-      });
+  const handleClick = () => {
+    window.history.back();
+  };
 
-    axios
-      .get(`https://api.themoviedb.org/3/movie/${movieId}/reviews`, {
-        params: {
-          api_key: '488a10199f756ebd19425cffe6e22e26',
-        },
-      })
-      .then(response => {
-        setReviews(response.data.results);
-      })
-      .catch(error => {
-        console.error('Error fetching movie reviews:', error);
-      });
-  }, [movieId]);
+  const handleLinkCastClick = () => {
+    setShowCast(!showCast);
+    if (!showCast) {
+      navigate('cast', { state: { from: location.pathname } });
+    } else {
+      navigate(cameBack);
+    }
+  };
+
+  const handleLinkReviewClick = () => {
+    setShowCast(!showCast);
+    if (!showCast) {
+      navigate('reviews', { state: { from: location.pathname } });
+    } else {
+      navigate(cameBack);
+    }
+  };
 
   return (
     <div className="container mt-4">
-      <Link to="/" className="btn btn-primary mb-3">
+      <button className="btn btn-primary mb-3" onClick={handleClick}>
         Go back
-      </Link>
+      </button>
       <div className="row">
         <div>
           <h2>{movieDetails.title}</h2>
@@ -77,23 +70,20 @@ const MovieDetails = () => {
           </p>
         </div>
       </div>
-      <h3
-        onClick={() => setShowCast(!showCast)}
+      <button
         style={{ cursor: 'pointer' }}
+        onClick={handleLinkCastClick}
         className="btn btn-primary mb-3 me-3"
       >
         Cast
-      </h3>
-      {showCast && <Cast cast={cast} />} {/* Use the Cast component */}
-      <h3
-        onClick={() => setShowReviews(!showReviews)}
+      </button>
+      <button
         style={{ cursor: 'pointer' }}
+        onClick={handleLinkReviewClick}
         className="btn btn-primary mb-3"
       >
-        Reviews
-      </h3>
-      {showReviews && <Reviews reviews={reviews} />}{' '}
-      {/* Use the Reviews component */}
+        Review
+      </button>
     </div>
   );
 };
