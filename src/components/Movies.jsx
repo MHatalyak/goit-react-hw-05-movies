@@ -1,11 +1,12 @@
 import React, { useState, useEffect } from 'react';
-import { Link, useSearchParams } from 'react-router-dom';
+import { Link, useLocation, useSearchParams } from 'react-router-dom';
 import axios from 'axios';
 
 const Movies = () => {
   const [searchQuery, setSearchQuery] = useState('');
   const [searchResults, setSearchResults] = useState([]);
   const [searchParams, setSearchParams] = useSearchParams();
+  const location = useLocation();
 
   useEffect(() => {
     const query = searchParams.get('query');
@@ -64,7 +65,7 @@ const Movies = () => {
       <div className="row">
         {searchResults.map(movie => (
           <div className="col-md-3 mb-3" key={movie.id}>
-            <Link to={`/movies/${movie.id}`}>
+            <Link to={`/movies/${movie.id}`} state={{ from: location }}>
               <img
                 src={`https://image.tmdb.org/t/p/w500/${movie.poster_path}`}
                 alt={movie.title}

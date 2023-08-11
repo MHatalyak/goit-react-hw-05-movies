@@ -1,13 +1,12 @@
 import React, { useState, useEffect } from 'react';
-import { useParams, useLocation, useNavigate } from 'react-router-dom';
+import { useParams, useLocation, Link } from 'react-router-dom';
 import axios from 'axios';
 
 const MovieDetails = () => {
   const { movieId } = useParams();
   const [movieDetails, setMovieDetails] = useState({});
-  const [showCast, setShowCast] = useState(false);
+
   const location = useLocation();
-  const navigate = useNavigate();
   const cameBack = location.state?.from ?? '/';
   useEffect(() => {
     axios
@@ -24,33 +23,11 @@ const MovieDetails = () => {
       });
   });
 
-  const handleClick = () => {
-    window.history.back();
-  };
-
-  const handleLinkCastClick = () => {
-    setShowCast(!showCast);
-    if (!showCast) {
-      navigate('cast', { state: { from: location.pathname } });
-    } else {
-      navigate(cameBack);
-    }
-  };
-
-  const handleLinkReviewClick = () => {
-    setShowCast(!showCast);
-    if (!showCast) {
-      navigate('reviews', { state: { from: location.pathname } });
-    } else {
-      navigate(cameBack);
-    }
-  };
-
   return (
     <div className="container mt-4">
-      <button className="btn btn-primary mb-3" onClick={handleClick}>
+      <Link to={cameBack} className="btn btn-primary mb-3">
         Go back
-      </button>
+      </Link>
       <div className="row">
         <div>
           <h2>{movieDetails.title}</h2>
@@ -70,20 +47,20 @@ const MovieDetails = () => {
           </p>
         </div>
       </div>
-      <button
-        style={{ cursor: 'pointer' }}
-        onClick={handleLinkCastClick}
+      <Link
+        to="cast"
+        state={{ from: cameBack }}
         className="btn btn-primary mb-3 me-3"
       >
         Cast
-      </button>
-      <button
-        style={{ cursor: 'pointer' }}
-        onClick={handleLinkReviewClick}
-        className="btn btn-primary mb-3"
+      </Link>
+      <Link
+        to="reviews"
+        state={{ from: cameBack }}
+        className="btn btn-primary mb-3 me-3"
       >
-        Review
-      </button>
+        Reviews
+      </Link>
     </div>
   );
 };
